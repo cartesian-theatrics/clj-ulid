@@ -1,6 +1,6 @@
 # clj-ulid
 
-Basic ULID utils for clojure. Wraps [Sulky ULID] (https://github.com/huxi/sulky/tree/master/sulky-ulid).
+Basic ULID utils for clojure. Wraps [Sulky ULID](https://github.com/huxi/sulky/tree/master/sulky-ulid).
 
 # Usage
 
