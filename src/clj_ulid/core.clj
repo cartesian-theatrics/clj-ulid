@@ -1,4 +1,4 @@
-(ns assist-analysis.ulid
+(ns clj-ulid.core
   (:import de.huxhorn.sulky.ulid.ULID
            de.huxhorn.sulky.ulid.ULID$Value
            java.util.UUID
@@ -7,50 +7,54 @@
 (defonce ^:private ulid-instance (ULID.))
 
 (defn ulid
+  "Generate a ULID object"
+  ^ULID
+  []
+  (.nextValue ulid-instance))
+
+(defn ulid-string
   "generates a ULID in string representation"
   ^String
   []
   (.nextULID ulid-instance))
 
-(defn ulid-bytes
+(defn ulid->bytes
   "generates a ULID in binary representation"
   ^bytes
   []
   (.toBytes (.nextValue ulid-instance)))
 
-(defn string->bytes
-  "converts a ULID from string representation to binary representation"
-  ^bytes
-  [^String s]
-  (.toBytes (ULID/parseULID s)))
+(defn ulid->string ^String [^ULID ulid]
+  (.toString ulid))
 
-(defn bytes->string
+(defn string->ulid
+  "Creates a ULID from a string representation."
+  ^ULID
+  [^String s]
+  (ULID/parseULID s))
+
+(defn bytes->ulid
   "converts a ULID from binary representation to string representation"
   ^String
   [^bytes b]
-  (.toString (ULID/fromBytes b)))
+  (ULID/fromBytes b))
 
-
-(defn to-bytes
+(defn ulid->bytes
   ^bytes
   [^ULID id]
   (.toBytes id))
 
-(defn ulid->uuid [ulid-string]
-  (let [bytes (string->bytes ulid-string)
+(defn ulid->uuid ^java.util.UUID [^ULID ulid]
+  (let [bytes (.toBytes ulid)
         bb (ByteBuffer/wrap bytes)
         low (.getLong bb)
         hi (.getLong bb)]
     (UUID. low hi)))
 
-(defn uuid->ulid [^java.util.UUID uuid]
+(defn uuid->ulid ^ULID [^java.util.UUID uuid]
   (let [hi (.getMostSignificantBits uuid)
         low (.getLeastSignificantBits uuid)
         buf (ByteBuffer/allocate (* 2 Long/BYTES))]
     (.putLong buf hi)
     (.putLong buf low)
     (ULID/fromBytes (.array buf))))
-
-(defn uuid-string->ulid [uuid-string]
-  (let [uuid (java.util.UUID/fromString uuid-string)]
-    (.toString (uuid->ulid uuid))))
