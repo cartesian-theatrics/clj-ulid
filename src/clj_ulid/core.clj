@@ -2,6 +2,7 @@
   (:import de.huxhorn.sulky.ulid.ULID
            de.huxhorn.sulky.ulid.ULID$Value
            java.util.UUID
+           [java.security MessageDigest]
            [java.nio ByteBuffer]))
 
 (defonce ^:private ulid-instance (ULID.))
@@ -55,6 +56,12 @@
   (let [hi (.getMostSignificantBits uuid)
         low (.getLeastSignificantBits uuid)
         buf (ByteBuffer/allocate (* 2 Long/BYTES))]
+    (.putLong buf hi)
+    (.putLong buf low)
+    (ULID/fromBytes (.array buf))))
+
+(defn from-longs ^ULID [^long hi ^long low]
+  (let [buf (ByteBuffer/allocate (* 2 Long/BYTES))]
     (.putLong buf hi)
     (.putLong buf low)
     (ULID/fromBytes (.array buf))))
